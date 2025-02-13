@@ -163,7 +163,7 @@ class App(cmd.Cmd):
             filename = "save.json"
 
         with open(filename, "w", encoding="UTF8") as handle:
-            handle.write(json.dumps(self.tracker, indent=2))
+            handle.write(json.dumps(self.tracker, indent=2, sort_keys=True))
         print(f"Saved current results to file '{filename}'")
 
     def do_load(self, filename):
@@ -174,8 +174,9 @@ class App(cmd.Cmd):
 
         with open(filename, "r", encoding="UTF8") as handle:
             self._reset_tracker()
+            # `json.dumps` will convert int keys to strings, so have to undo
+            # that here to keep integers, which other parts of the code expect
             self.tracker.update({
-                # `json.dumps` will convert int keys to strings
                 int(k): v for k, v in json.loads(handle.read()).items()
             })
         print(f"Loaded previous results from file '{filename}'")
